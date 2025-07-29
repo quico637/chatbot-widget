@@ -1,11 +1,6 @@
 // Chat Widget Script
 (function() {
     
-        // Justo al inicio del widget
-    let quickRepliesDiv;
-    let quickRepliesActive = false; // <- Añade esto arriba de renderQuickReplies
-
-    
     // Create and inject styles
     const styles = `
         .n8n-chat-widget {
@@ -399,23 +394,24 @@
         return crypto.randomUUID();
     }
 
-   function renderQuickReplies() {
-    if (!config.predefinedMessages.length) return;
-    if (!quickRepliesDiv) {
-        quickRepliesDiv = document.createElement('div');
-        quickRepliesDiv.style.display = "flex";
-        quickRepliesDiv.style.flexWrap = "wrap";
-        quickRepliesDiv.style.justifyContent = "center";
-        quickRepliesDiv.style.gap = "12px";
-        quickRepliesDiv.style.marginTop = "24px";
-        quickRepliesDiv.style.marginBottom = "28px";
-        quickRepliesDiv.style.padding = "8px 0";
-        quickRepliesDiv.style.borderRadius = "15px";
-        quickRepliesDiv.style.background = "#faf7ff";
-        quickRepliesDiv.style.boxShadow = "0 2px 10px 0 rgba(133, 79, 255, 0.06)";
-        messagesContainer.parentNode.insertBefore(quickRepliesDiv, messagesContainer.nextSibling);
-    }
-    quickRepliesDiv.innerHTML = '';
+  // Quick Replies solo en la primera interacción tras abrir chat
+let quickRepliesDiv;
+let quickRepliesRendered = false;
+
+function renderQuickReplies() {
+    if (quickRepliesRendered || !config.predefinedMessages.length) return;
+    quickRepliesDiv = document.createElement('div');
+    quickRepliesDiv.style.display = "flex";
+    quickRepliesDiv.style.flexWrap = "wrap";
+    quickRepliesDiv.style.justifyContent = "center";
+    quickRepliesDiv.style.gap = "12px";
+    quickRepliesDiv.style.marginTop = "24px";
+    quickRepliesDiv.style.marginBottom = "20px";
+    quickRepliesDiv.style.padding = "10px 0";
+    quickRepliesDiv.style.borderRadius = "15px";
+    quickRepliesDiv.style.background = "#faf7ff";
+    quickRepliesDiv.style.boxShadow = "0 2px 10px 0 rgba(133, 79, 255, 0.06)";
+
     config.predefinedMessages.forEach(msg => {
         const btn = document.createElement('button');
         btn.textContent = msg;
@@ -440,14 +436,20 @@
         };
         quickRepliesDiv.appendChild(btn);
     });
-    quickRepliesDiv.style.display = "flex";
-    quickRepliesActive = true;
+
+    // INSERCIÓN: Justo encima de los mensajes, para que no desaparezcan al enviar el primer mensaje
+    messagesContainer.parentNode.insertBefore(quickRepliesDiv, messagesContainer);
+    quickRepliesRendered = true;
 }
 
 function hideQuickReplies() {
-    if (quickRepliesDiv) quickRepliesDiv.style.display = "none";
-    quickRepliesActive = false;
+    if (quickRepliesDiv && quickRepliesDiv.parentNode) {
+        quickRepliesDiv.parentNode.removeChild(quickRepliesDiv);
+        quickRepliesDiv = null;
+    }
+    quickRepliesRendered = false;
 }
+
 
     async function startNewConversation() {
         currentSessionId = generateUUID();
@@ -473,7 +475,7 @@ function hideQuickReplies() {
             chatContainer.querySelector('.brand-header').style.display = 'none';
             chatContainer.querySelector('.new-conversation').style.display = 'none';
             chatInterface.classList.add('active');
-            renderQuickReplies();
+            
 
             // Primer mensaje del bot: lo que venga de N8n, o fallback personalizado
             let firstMsg = '';
@@ -542,6 +544,7 @@ function hideQuickReplies() {
     sendButton.addEventListener('click', () => {
         const message = textarea.value.trim();
         if (message) {
+            hideQuickReplies();  // Añade esto aquí
             sendMessage(message);
             textarea.value = '';
         }
