@@ -1,5 +1,11 @@
 // Chat Widget Script
 (function() {
+    
+        // Justo al inicio del widget
+    let quickRepliesDiv;
+    let quickRepliesActive = false; // <- Añade esto arriba de renderQuickReplies
+
+    
     // Create and inject styles
     const styles = `
         .n8n-chat-widget {
@@ -393,42 +399,55 @@
         return crypto.randomUUID();
     }
 
-// Crea área de quick replies si hay mensajes predefinidos
-    let quickRepliesDiv;
-    function renderQuickReplies() {
-        if (!config.predefinedMessages.length) return;
-        if (!quickRepliesDiv) {
-            quickRepliesDiv = document.createElement('div');
-            quickRepliesDiv.style.display = "flex";
-            quickRepliesDiv.style.flexWrap = "wrap";
-            quickRepliesDiv.style.gap = "8px";
-            quickRepliesDiv.style.marginBottom = "12px";
-            quickRepliesDiv.style.marginTop = "8px";
-            messagesContainer.parentNode.insertBefore(quickRepliesDiv, messagesContainer);
-        }
-        quickRepliesDiv.innerHTML = '';
-        config.predefinedMessages.forEach(msg => {
-            const btn = document.createElement('button');
-            btn.textContent = msg;
-            btn.type = "button";
-            btn.style.padding = "7px 15px";
-            btn.style.borderRadius = "8px";
-            btn.style.background = "var(--chat--color-primary)";
-            btn.style.color = "#fff";
-            btn.style.fontWeight = "500";
-            btn.style.border = "none";
-            btn.style.cursor = "pointer";
-            btn.style.fontSize = "13px";
-            btn.style.transition = "background 0.15s";
-            btn.onmouseenter = () => btn.style.background = "var(--chat--color-secondary)";
-            btn.onmouseleave = () => btn.style.background = "var(--chat--color-primary)";
-            btn.onclick = () => {
-                sendMessage(msg);
-                textarea.value = "";
-            };
-            quickRepliesDiv.appendChild(btn);
-        });
+   function renderQuickReplies() {
+    if (!config.predefinedMessages.length) return;
+    if (!quickRepliesDiv) {
+        quickRepliesDiv = document.createElement('div');
+        quickRepliesDiv.style.display = "flex";
+        quickRepliesDiv.style.flexWrap = "wrap";
+        quickRepliesDiv.style.justifyContent = "center";
+        quickRepliesDiv.style.gap = "12px";
+        quickRepliesDiv.style.marginTop = "24px";
+        quickRepliesDiv.style.marginBottom = "28px";
+        quickRepliesDiv.style.padding = "8px 0";
+        quickRepliesDiv.style.borderRadius = "15px";
+        quickRepliesDiv.style.background = "#faf7ff";
+        quickRepliesDiv.style.boxShadow = "0 2px 10px 0 rgba(133, 79, 255, 0.06)";
+        messagesContainer.parentNode.insertBefore(quickRepliesDiv, messagesContainer.nextSibling);
     }
+    quickRepliesDiv.innerHTML = '';
+    config.predefinedMessages.forEach(msg => {
+        const btn = document.createElement('button');
+        btn.textContent = msg;
+        btn.type = "button";
+        btn.style.padding = "11px 20px";
+        btn.style.borderRadius = "10px";
+        btn.style.background = "var(--chat--color-primary)";
+        btn.style.color = "#fff";
+        btn.style.fontWeight = "500";
+        btn.style.border = "none";
+        btn.style.cursor = "pointer";
+        btn.style.fontSize = "15px";
+        btn.style.margin = "4px 0";
+        btn.style.boxShadow = "0 2px 8px 0 rgba(133, 79, 255, 0.08)";
+        btn.style.transition = "background 0.13s";
+        btn.onmouseenter = () => btn.style.background = "var(--chat--color-secondary)";
+        btn.onmouseleave = () => btn.style.background = "var(--chat--color-primary)";
+        btn.onclick = () => {
+            hideQuickReplies();
+            sendMessage(msg);
+            textarea.value = "";
+        };
+        quickRepliesDiv.appendChild(btn);
+    });
+    quickRepliesDiv.style.display = "flex";
+    quickRepliesActive = true;
+}
+
+function hideQuickReplies() {
+    if (quickRepliesDiv) quickRepliesDiv.style.display = "none";
+    quickRepliesActive = false;
+}
 
     async function startNewConversation() {
         currentSessionId = generateUUID();
@@ -469,6 +488,9 @@
             botMessageDiv.textContent = firstMsg;
             messagesContainer.appendChild(botMessageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            renderQuickReplies(); // Justo después de poner el primer mensaje
+
         } catch (error) {
             console.error('Error:', error);
         }
@@ -485,6 +507,8 @@
                 userId: ""
             }
         };
+
+        hideQuickReplies(); // Para ocultar los quick replies al primer envío
 
         const userMessageDiv = document.createElement('div');
         userMessageDiv.className = 'chat-message user';
@@ -528,6 +552,7 @@
             e.preventDefault();
             const message = textarea.value.trim();
             if (message) {
+                hideQuickReplies(); // Esto también aquí
                 sendMessage(message);
                 textarea.value = '';
             }
