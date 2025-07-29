@@ -284,7 +284,7 @@
     styleSheet.textContent = styles;
     document.head.appendChild(styleSheet);
 
-    // Default configuration
+   // Añade a tu defaultConfig:
     const defaultConfig = {
         webhook: {
             url: '',
@@ -302,16 +302,21 @@
             position: 'right',
             backgroundColor: '#ffffff',
             fontColor: '#333333'
-        }
+        },
+        predefinedMessages: [],  // <--- NEW: Quick reply messages
+        fallbackWelcomeText: '¡Hola! ¿Cómo te puedo ayudar?' // <--- NEW: Fallback first message
     };
 
-    // Merge user config with defaults
+    // Merge config:
     const config = window.ChatWidgetConfig ? 
         {
             webhook: { ...defaultConfig.webhook, ...window.ChatWidgetConfig.webhook },
             branding: { ...defaultConfig.branding, ...window.ChatWidgetConfig.branding },
-            style: { ...defaultConfig.style, ...window.ChatWidgetConfig.style }
+            style: { ...defaultConfig.style, ...window.ChatWidgetConfig.style },
+            predefinedMessages: window.ChatWidgetConfig.predefinedMessages || [],
+            fallbackWelcomeText: window.ChatWidgetConfig.fallbackWelcomeText || defaultConfig.fallbackWelcomeText
         } : defaultConfig;
+
 
     // Prevent multiple initializations
     if (window.N8NChatWidgetInitialized) return;
@@ -388,6 +393,43 @@
         return crypto.randomUUID();
     }
 
+// Crea área de quick replies si hay mensajes predefinidos
+    let quickRepliesDiv;
+    function renderQuickReplies() {
+        if (!config.predefinedMessages.length) return;
+        if (!quickRepliesDiv) {
+            quickRepliesDiv = document.createElement('div');
+            quickRepliesDiv.style.display = "flex";
+            quickRepliesDiv.style.flexWrap = "wrap";
+            quickRepliesDiv.style.gap = "8px";
+            quickRepliesDiv.style.marginBottom = "12px";
+            quickRepliesDiv.style.marginTop = "8px";
+            messagesContainer.parentNode.insertBefore(quickRepliesDiv, messagesContainer);
+        }
+        quickRepliesDiv.innerHTML = '';
+        config.predefinedMessages.forEach(msg => {
+            const btn = document.createElement('button');
+            btn.textContent = msg;
+            btn.type = "button";
+            btn.style.padding = "7px 15px";
+            btn.style.borderRadius = "8px";
+            btn.style.background = "var(--chat--color-primary)";
+            btn.style.color = "#fff";
+            btn.style.fontWeight = "500";
+            btn.style.border = "none";
+            btn.style.cursor = "pointer";
+            btn.style.fontSize = "13px";
+            btn.style.transition = "background 0.15s";
+            btn.onmouseenter = () => btn.style.background = "var(--chat--color-secondary)";
+            btn.onmouseleave = () => btn.style.background = "var(--chat--color-primary)";
+            btn.onclick = () => {
+                sendMessage(msg);
+                textarea.value = "";
+            };
+            quickRepliesDiv.appendChild(btn);
+        });
+    }
+
     async function startNewConversation() {
         currentSessionId = generateUUID();
         const data = [{
@@ -412,16 +454,26 @@
             chatContainer.querySelector('.brand-header').style.display = 'none';
             chatContainer.querySelector('.new-conversation').style.display = 'none';
             chatInterface.classList.add('active');
+            renderQuickReplies();
 
+            // Primer mensaje del bot: lo que venga de N8n, o fallback personalizado
+            let firstMsg = '';
+            if (Array.isArray(responseData)) {
+                firstMsg = responseData[0]?.output;
+            } else if (responseData && typeof responseData === 'object') {
+                firstMsg = responseData.output;
+            }
+            if (!firstMsg) firstMsg = config.fallbackWelcomeText;
             const botMessageDiv = document.createElement('div');
             botMessageDiv.className = 'chat-message bot';
-            botMessageDiv.textContent = Array.isArray(responseData) ? responseData[0].output : responseData.output;
+            botMessageDiv.textContent = firstMsg;
             messagesContainer.appendChild(botMessageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         } catch (error) {
             console.error('Error:', error);
         }
     }
+
 
     async function sendMessage(message) {
         const messageData = {
