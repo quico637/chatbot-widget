@@ -1,6 +1,5 @@
 // Chat Widget Script
 (function() {
-    
     // Create and inject styles
     const styles = `
         .n8n-chat-widget {
@@ -10,7 +9,6 @@
             --chat--color-font: var(--n8n-chat-font-color, #333333);
             font-family: 'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
-
         .n8n-chat-widget .chat-container {
             position: fixed;
             bottom: 20px;
@@ -26,17 +24,14 @@
             overflow: hidden;
             font-family: inherit;
         }
-
         .n8n-chat-widget .chat-container.position-left {
             right: auto;
             left: 20px;
         }
-
         .n8n-chat-widget .chat-container.open {
             display: flex;
             flex-direction: column;
         }
-
         .n8n-chat-widget .brand-header {
             padding: 16px;
             display: flex;
@@ -45,7 +40,6 @@
             border-bottom: 1px solid rgba(133, 79, 255, 0.1);
             position: relative;
         }
-
         .n8n-chat-widget .close-button {
             position: absolute;
             right: 16px;
@@ -63,86 +57,23 @@
             font-size: 20px;
             opacity: 0.6;
         }
-
         .n8n-chat-widget .close-button:hover {
             opacity: 1;
         }
-
         .n8n-chat-widget .brand-header img {
             width: 32px;
             height: 32px;
         }
-
         .n8n-chat-widget .brand-header span {
             font-size: 18px;
             font-weight: 500;
             color: var(--chat--color-font);
         }
-
-        .n8n-chat-widget .new-conversation {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px;
-            text-align: center;
-            width: 100%;
-            max-width: 300px;
-        }
-
-        .n8n-chat-widget .welcome-text {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--chat--color-font);
-            margin-bottom: 24px;
-            line-height: 1.3;
-        }
-
-        .n8n-chat-widget .new-chat-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 16px 24px;
-            background: linear-gradient(135deg, var(--chat--color-primary) 0%, var(--chat--color-secondary) 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: transform 0.3s;
-            font-weight: 500;
-            font-family: inherit;
-            margin-bottom: 12px;
-        }
-
-        .n8n-chat-widget .new-chat-btn:hover {
-            transform: scale(1.02);
-        }
-
-        .n8n-chat-widget .message-icon {
-            width: 20px;
-            height: 20px;
-        }
-
-        .n8n-chat-widget .response-text {
-            font-size: 14px;
-            color: var(--chat--color-font);
-            opacity: 0.7;
-            margin: 0;
-        }
-
         .n8n-chat-widget .chat-interface {
-            display: none;
+            display: flex;
             flex-direction: column;
             height: 100%;
         }
-
-        .n8n-chat-widget .chat-interface.active {
-            display: flex;
-        }
-
         .n8n-chat-widget .chat-messages {
             flex: 1;
             overflow-y: auto;
@@ -151,7 +82,6 @@
             display: flex;
             flex-direction: column;
         }
-
         .n8n-chat-widget .chat-message {
             padding: 12px 16px;
             margin: 8px 0;
@@ -161,7 +91,6 @@
             font-size: 14px;
             line-height: 1.5;
         }
-
         .n8n-chat-widget .chat-message.user {
             background: linear-gradient(135deg, var(--chat--color-primary) 0%, var(--chat--color-secondary) 100%);
             color: white;
@@ -169,7 +98,6 @@
             box-shadow: 0 4px 12px rgba(133, 79, 255, 0.2);
             border: none;
         }
-
         .n8n-chat-widget .chat-message.bot {
             background: var(--chat--color-background);
             border: 1px solid rgba(133, 79, 255, 0.2);
@@ -177,7 +105,29 @@
             align-self: flex-start;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
-
+        .n8n-chat-widget .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 16px 0;
+            padding: 0 4px;
+        }
+        .n8n-chat-widget .quick-reply-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--chat--color-primary);
+            background: transparent;
+            color: var(--chat--color-primary);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .n8n-chat-widget .quick-reply-btn:hover {
+            background: var(--chat--color-primary);
+            color: white;
+        }
         .n8n-chat-widget .chat-input {
             padding: 16px;
             background: var(--chat--color-background);
@@ -185,7 +135,6 @@
             display: flex;
             gap: 8px;
         }
-
         .n8n-chat-widget .chat-input textarea {
             flex: 1;
             padding: 12px;
@@ -197,12 +146,10 @@
             font-family: inherit;
             font-size: 14px;
         }
-
         .n8n-chat-widget .chat-input textarea::placeholder {
             color: var(--chat--color-font);
             opacity: 0.6;
         }
-
         .n8n-chat-widget .chat-input button {
             background: linear-gradient(135deg, var(--chat--color-primary) 0%, var(--chat--color-secondary) 100%);
             color: white;
@@ -214,11 +161,9 @@
             font-family: inherit;
             font-weight: 500;
         }
-
         .n8n-chat-widget .chat-input button:hover {
             transform: scale(1.05);
         }
-
         .n8n-chat-widget .chat-toggle {
             position: fixed;
             bottom: 20px;
@@ -237,40 +182,17 @@
             align-items: center;
             justify-content: center;
         }
-
         .n8n-chat-widget .chat-toggle.position-left {
             right: auto;
             left: 20px;
         }
-
         .n8n-chat-widget .chat-toggle:hover {
             transform: scale(1.05);
         }
-
         .n8n-chat-widget .chat-toggle svg {
             width: 24px;
             height: 24px;
             fill: currentColor;
-        }
-
-        .n8n-chat-widget .chat-footer {
-            padding: 8px;
-            text-align: center;
-            background: var(--chat--color-background);
-            border-top: 1px solid rgba(133, 79, 255, 0.1);
-        }
-
-        .n8n-chat-widget .chat-footer a {
-            color: var(--chat--color-primary);
-            text-decoration: none;
-            font-size: 12px;
-            opacity: 0.8;
-            transition: opacity 0.2s;
-            font-family: inherit;
-        }
-
-        .n8n-chat-widget .chat-footer a:hover {
-            opacity: 1;
         }
     `;
 
@@ -285,7 +207,6 @@
     styleSheet.textContent = styles;
     document.head.appendChild(styleSheet);
 
-   // Añade a tu defaultConfig:
     const defaultConfig = {
         webhook: {
             url: '',
@@ -304,11 +225,11 @@
             backgroundColor: '#ffffff',
             fontColor: '#333333'
         },
-        predefinedMessages: [],  // <--- NEW: Quick reply messages
-        fallbackWelcomeText: '¡Hola! ¿Cómo te puedo ayudar?' // <--- NEW: Fallback first message
+        predefinedMessages: [],
+        fallbackWelcomeText: '¡Hola! ¿Cómo te puedo ayudar?'
     };
 
-    // Merge config:
+    // Merge config
     const config = window.ChatWidgetConfig ? 
         {
             webhook: { ...defaultConfig.webhook, ...window.ChatWidgetConfig.webhook },
@@ -318,12 +239,12 @@
             fallbackWelcomeText: window.ChatWidgetConfig.fallbackWelcomeText || defaultConfig.fallbackWelcomeText
         } : defaultConfig;
 
-
     // Prevent multiple initializations
     if (window.N8NChatWidgetInitialized) return;
     window.N8NChatWidgetInitialized = true;
 
     let currentSessionId = '';
+    let quickRepliesRendered = false;
 
     // Create widget container
     const widgetContainer = document.createElement('div');
@@ -338,24 +259,7 @@
     const chatContainer = document.createElement('div');
     chatContainer.className = `chat-container${config.style.position === 'left' ? ' position-left' : ''}`;
     
-    const newConversationHTML = `
-        <div class="brand-header">
-            <img src="${config.branding.logo}" alt="${config.branding.name}">
-            <span>${config.branding.name}</span>
-            <button class="close-button">×</button>
-        </div>
-        <div class="new-conversation">
-            <h2 class="welcome-text">${config.branding.welcomeText}</h2>
-            <button class="new-chat-btn">
-                <svg class="message-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/>
-                </svg>
-                Send us a message
-            </button>
-            <p class="response-text">${config.branding.responseTimeText}</p>
-        </div>
-    `;
-
+    // Direct chat interface (no welcome screen)
     const chatInterfaceHTML = `
         <div class="chat-interface">
             <div class="brand-header">
@@ -371,7 +275,7 @@
         </div>
     `;
     
-    chatContainer.innerHTML = newConversationHTML + chatInterfaceHTML;
+    chatContainer.innerHTML = chatInterfaceHTML;
     
     const toggleButton = document.createElement('button');
     toggleButton.className = `chat-toggle${config.style.position === 'left' ? ' position-left' : ''}`;
@@ -384,7 +288,6 @@
     widgetContainer.appendChild(toggleButton);
     document.body.appendChild(widgetContainer);
 
-    const newChatBtn = chatContainer.querySelector('.new-chat-btn');
     const chatInterface = chatContainer.querySelector('.chat-interface');
     const messagesContainer = chatContainer.querySelector('.chat-messages');
     const textarea = chatContainer.querySelector('textarea');
@@ -394,65 +297,40 @@
         return crypto.randomUUID();
     }
 
-  // Quick Replies solo en la primera interacción tras abrir chat
-let quickRepliesDiv;
-let quickRepliesRendered = false;
-
-function renderQuickReplies() {
-    if (quickRepliesRendered || !config.predefinedMessages.length) return;
-    quickRepliesDiv = document.createElement('div');
-    quickRepliesDiv.style.display = "flex";
-    quickRepliesDiv.style.flexWrap = "wrap";
-    quickRepliesDiv.style.justifyContent = "center";
-    quickRepliesDiv.style.gap = "12px";
-    quickRepliesDiv.style.marginTop = "24px";
-    quickRepliesDiv.style.marginBottom = "20px";
-    quickRepliesDiv.style.padding = "10px 0";
-    quickRepliesDiv.style.borderRadius = "15px";
-    quickRepliesDiv.style.background = "#faf7ff";
-    quickRepliesDiv.style.boxShadow = "0 2px 10px 0 rgba(133, 79, 255, 0.06)";
-
-    config.predefinedMessages.forEach(msg => {
-        const btn = document.createElement('button');
-        btn.textContent = msg;
-        btn.type = "button";
-        btn.style.padding = "11px 20px";
-        btn.style.borderRadius = "10px";
-        btn.style.background = "var(--chat--color-primary)";
-        btn.style.color = "#fff";
-        btn.style.fontWeight = "500";
-        btn.style.border = "none";
-        btn.style.cursor = "pointer";
-        btn.style.fontSize = "15px";
-        btn.style.margin = "4px 0";
-        btn.style.boxShadow = "0 2px 8px 0 rgba(133, 79, 255, 0.08)";
-        btn.style.transition = "background 0.13s";
-        btn.onmouseenter = () => btn.style.background = "var(--chat--color-secondary)";
-        btn.onmouseleave = () => btn.style.background = "var(--chat--color-primary)";
-        btn.onclick = () => {
-            hideQuickReplies();
-            sendMessage(msg);
-            textarea.value = "";
-        };
-        quickRepliesDiv.appendChild(btn);
-    });
-
-    // INSERCIÓN: Justo encima de los mensajes, para que no desaparezcan al enviar el primer mensaje
-    messagesContainer.parentNode.insertBefore(quickRepliesDiv, messagesContainer);
-    quickRepliesRendered = true;
-}
-
-function hideQuickReplies() {
-    if (quickRepliesDiv && quickRepliesDiv.parentNode) {
-        quickRepliesDiv.parentNode.removeChild(quickRepliesDiv);
-        quickRepliesDiv = null;
+    function renderQuickReplies() {
+        if (quickRepliesRendered || !config.predefinedMessages.length) return;
+        
+        const quickRepliesDiv = document.createElement('div');
+        quickRepliesDiv.className = 'quick-replies';
+        
+        config.predefinedMessages.forEach(msg => {
+            const btn = document.createElement('button');
+            btn.textContent = msg;
+            btn.className = 'quick-reply-btn';
+            btn.onclick = () => {
+                hideQuickReplies();
+                sendMessage(msg);
+                textarea.value = "";
+            };
+            quickRepliesDiv.appendChild(btn);
+        });
+        
+        messagesContainer.appendChild(quickRepliesDiv);
+        quickRepliesRendered = true;
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-    quickRepliesRendered = false;
-}
 
+    function hideQuickReplies() {
+        const quickReplies = messagesContainer.querySelector('.quick-replies');
+        if (quickReplies) {
+            quickReplies.remove();
+        }
+        quickRepliesRendered = false;
+    }
 
-    async function startNewConversation() {
+    async function initializeChat() {
         currentSessionId = generateUUID();
+        
         const data = [{
             action: "loadPreviousSession",
             sessionId: currentSessionId,
@@ -470,14 +348,10 @@ function hideQuickReplies() {
                 },
                 body: JSON.stringify(data)
             });
-
-            const responseData = await response.json();
-            chatContainer.querySelector('.brand-header').style.display = 'none';
-            chatContainer.querySelector('.new-conversation').style.display = 'none';
-            chatInterface.classList.add('active');
             
-
-            // Primer mensaje del bot: lo que venga de N8n, o fallback personalizado
+            const responseData = await response.json();
+            
+            // First bot message
             let firstMsg = '';
             if (Array.isArray(responseData)) {
                 firstMsg = responseData[0]?.output;
@@ -485,19 +359,28 @@ function hideQuickReplies() {
                 firstMsg = responseData.output;
             }
             if (!firstMsg) firstMsg = config.fallbackWelcomeText;
+
             const botMessageDiv = document.createElement('div');
             botMessageDiv.className = 'chat-message bot';
             botMessageDiv.textContent = firstMsg;
             messagesContainer.appendChild(botMessageDiv);
+            
+            // Render quick replies after first message
+            renderQuickReplies();
+            
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-            renderQuickReplies(); // Justo después de poner el primer mensaje
-
         } catch (error) {
             console.error('Error:', error);
+            // Show fallback message on error
+            const botMessageDiv = document.createElement('div');
+            botMessageDiv.className = 'chat-message bot';
+            botMessageDiv.textContent = config.fallbackWelcomeText;
+            messagesContainer.appendChild(botMessageDiv);
+            
+            renderQuickReplies();
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
     }
-
 
     async function sendMessage(message) {
         const messageData = {
@@ -510,7 +393,7 @@ function hideQuickReplies() {
             }
         };
 
-        hideQuickReplies(); // Para ocultar los quick replies al primer envío
+        hideQuickReplies();
 
         const userMessageDiv = document.createElement('div');
         userMessageDiv.className = 'chat-message user';
@@ -539,12 +422,9 @@ function hideQuickReplies() {
         }
     }
 
-    newChatBtn.addEventListener('click', startNewConversation);
-    
     sendButton.addEventListener('click', () => {
         const message = textarea.value.trim();
         if (message) {
-            hideQuickReplies();  // Añade esto aquí
             sendMessage(message);
             textarea.value = '';
         }
@@ -555,7 +435,6 @@ function hideQuickReplies() {
             e.preventDefault();
             const message = textarea.value.trim();
             if (message) {
-                hideQuickReplies(); // Esto también aquí
                 sendMessage(message);
                 textarea.value = '';
             }
@@ -563,14 +442,61 @@ function hideQuickReplies() {
     });
     
     toggleButton.addEventListener('click', () => {
+        const isOpening = !chatContainer.classList.contains('open');
         chatContainer.classList.toggle('open');
+        
+        // Initialize chat when opening for the first time
+        if (isOpening && !currentSessionId) {
+            initializeChat();
+        }
     });
 
-    // Add close button handlers
-    const closeButtons = chatContainer.querySelectorAll('.close-button');
-    closeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            chatContainer.classList.remove('open');
-        });
+    // Add close button handler
+    const closeButton = chatContainer.querySelector('.close-button');
+    closeButton.addEventListener('click', () => {
+        chatContainer.classList.remove('open');
     });
+
+    // Function to reinitialize widget (for dynamic config updates)
+    window.reinitializeChatWidget = function() {
+        // Clear existing messages and session
+        messagesContainer.innerHTML = '';
+        currentSessionId = '';
+        quickRepliesRendered = false;
+        
+        // Update config
+        const newConfig = window.ChatWidgetConfig;
+        if (newConfig) {
+            // Update CSS variables
+            widgetContainer.style.setProperty('--n8n-chat-primary-color', newConfig.style?.primaryColor || config.style.primaryColor);
+            widgetContainer.style.setProperty('--n8n-chat-secondary-color', newConfig.style?.secondaryColor || config.style.secondaryColor);
+            widgetContainer.style.setProperty('--n8n-chat-background-color', newConfig.style?.backgroundColor || config.style.backgroundColor);
+            widgetContainer.style.setProperty('--n8n-chat-font-color', newConfig.style?.fontColor || config.style.fontColor);
+            
+            // Update branding
+            const logo = chatContainer.querySelector('.brand-header img');
+            const name = chatContainer.querySelector('.brand-header span');
+            if (logo) logo.src = newConfig.branding?.logo || config.branding.logo;
+            if (name) name.textContent = newConfig.branding?.name || config.branding.name;
+            
+            // Update position
+            const position = newConfig.style?.position || config.style.position;
+            chatContainer.className = `chat-container${position === 'left' ? ' position-left' : ''}`;
+            toggleButton.className = `chat-toggle${position === 'left' ? ' position-left' : ''}`;
+            
+            // Merge new config
+            Object.assign(config, {
+                webhook: { ...config.webhook, ...newConfig.webhook },
+                branding: { ...config.branding, ...newConfig.branding },
+                style: { ...config.style, ...newConfig.style },
+                predefinedMessages: newConfig.predefinedMessages || config.predefinedMessages,
+                fallbackWelcomeText: newConfig.fallbackWelcomeText || config.fallbackWelcomeText
+            });
+        }
+        
+        // Reinitialize if chat is open
+        if (chatContainer.classList.contains('open')) {
+            initializeChat();
+        }
+    };
 })();
